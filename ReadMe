@@ -1,0 +1,20 @@
+This is the supplement for the article 
+
+"Coronavirus & Care: How the Coronavirus Crisis Affected Fathers’ Involvement in Germany" by Michaela Kreyenfeld and Sabine Zinn
+published in Demographic Research (LINK will be added as soon as it is available)
+
+The supplement comprises the following R files
+- `prepareData.R' for preparing the data used for analyses for the years 2019 (SOEP-Core) and 2020 (SOEP-CoV)
+- `descriptives.R' for computing descriptive statistics on care times in 2019 and 2020  (SOEP-CoV)
+- `analyse.R' for computing the regression models (inclusively 95% confidence intervals by basic bootstrapping) for the years 2019 and 2020  (SOEP-CoV)
+- `prepareData_2018.R' for preparing the data used for analyses for the years 2018 and 2019 (SOEP-Core) 
+- `descriptives_2018.R' for computing descriptive statistics on care times in 2018 and 2019 (SOEP-Core) 
+- `analyse_2018.R' for computing the regression models (inclusively 95% confidence intervals by basic bootstrapping) for the years 2018 and 2019 (SOEP-Core) 
+
+BEWARE: 
+- The SOEP-Core data for 2018 (release v35) can be requested via https://www.diw.de/en/diw_02.c.222829.en/access_and_ordering.html
+- Not yet freely available to the scientific are the SOEP-Core 2019 data and the SOEP-CoV data.
+- The SOEP-Core 2019 data will presuminlgy available in February 2021 to the scientific community (next release v36).
+- The release of the SOEP-CoV 2020 data is planned with v37 in early 2022.
+
+
