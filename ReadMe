@@ -3,18 +3,42 @@ This is the supplement for the article
 "Coronavirus & Care: How the Coronavirus Crisis Affected Fathers’ Involvement in Germany" by Michaela Kreyenfeld and Sabine Zinn
 published in Demographic Research (LINK will be added as soon as it is available)
 
-The supplement comprises the following R files
+-----
+Data 
+-----
+- The SOEP-Core data for 2018 (release v35) can be requested via https://www.diw.de/en/diw_02.c.222829.en/access_and_ordering.html
+- Not yet freely available to the scientific are the SOEP-Core 2019 data and the SOEP-CoV data.
+- The SOEP-Core 2019 data will presuminlgy available in February 2021 to the scientific community (next release v36).
+- The release of the SOEP-CoV 2020 data is planned with v37 in early 2022.
+
+-----------------------------
+Basic variable description
+-----------------------------
+Variables used (raw, not yet prepared for data user, will be in upcoming releases v36 and v37): 
+- birth dates of children: "bjk_87_02_1","bjk_87_02_2","bjk_87_02_3","bjk_87_02_4","bjk_87_02_5","bjk_87_02_6","bjk_87_02_7","bjk_87_02_8","bjk_87_02_9"
+- Place of living at interview: federal state "bula"
+- Living arrangement: "bjp_197", "bjp_276_q154"
+- hours spend for child care: pli0044_v3
+- survey weights for SOEP CoV survey: phrf_cati
+Variables generated within SOEP data:
+- hid - household ID
+- pid - person ID
+- syear - survey year
+- gebjahr - birth date of paren
+- hgtyp1hh - household type
+- sex - gender of surveyed person
+- pgcasmin - CASMIN educational attainment
+- plb0022_h - employment status (harmonized)
+- migback - migration background
+
+------------
+Source Code
+------------
+The supplement comprises the following R files (R version x64, 3.6.2 has been used for data preparation and analysis)
 - `prepareData.R' for preparing the data used for analyses for the years 2019 (SOEP-Core) and 2020 (SOEP-CoV)
 - `descriptives.R' for computing descriptive statistics on care times in 2019 and 2020  (SOEP-CoV)
 - `analyse.R' for computing the regression models (inclusively 95% confidence intervals by basic bootstrapping) for the years 2019 and 2020  (SOEP-CoV)
 - `prepareData_2018.R' for preparing the data used for analyses for the years 2018 and 2019 (SOEP-Core) 
 - `descriptives_2018.R' for computing descriptive statistics on care times in 2018 and 2019 (SOEP-Core) 
 - `analyse_2018.R' for computing the regression models (inclusively 95% confidence intervals by basic bootstrapping) for the years 2018 and 2019 (SOEP-Core) 
-
-BEWARE: 
-- The SOEP-Core data for 2018 (release v35) can be requested via https://www.diw.de/en/diw_02.c.222829.en/access_and_ordering.html
-- Not yet freely available to the scientific are the SOEP-Core 2019 data and the SOEP-CoV data.
-- The SOEP-Core 2019 data will presuminlgy available in February 2021 to the scientific community (next release v36).
-- The release of the SOEP-CoV 2020 data is planned with v37 in early 2022.
-
 
