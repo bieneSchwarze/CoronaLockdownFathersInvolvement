@@ -14,16 +14,19 @@ library(ggplot2)
 # ---------------------------------------------------------------------
 # Load Data
 # ---------------------------------------------------------------------
-setwd("...") # add path
-load("_workspace_dataDescribed.RData") # load workspace stored from descriptives.R
+setwd("G:\\Michaela_Analysen\\Data")
+load("_workspace_dataDescribed_23062020.RData")
+set.seed(346)
 
 # ---------------------------------------------------------------------------
 # Function to get predicted diff times for categories & confidence intervals
 # --------------------------------------------------------------------------
-# FUNCTION linear model
+# FUNCTION diff-in-diff
 getPredDiffTimes <- function(DDat) {
-
-  MODEL <- lm(diff ~ hoursCildCare_2019 + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
+  
+  #DDat <- DAT_panel_m
+  
+  MODEL <- lm(diff ~ hoursCildCare_2019 + OW + mig + as.factor(ageYoungChild_cat) + 
                   as.factor(numChHH_cat) +  as.factor(eduLevel) + as.factor(empl_2019),  
                 weights=phrf_cati, data = DDat)
   summary(MODEL)
@@ -60,7 +63,7 @@ getPredDiffTimes <- function(DDat) {
   makeTheBoot <- function(it){
     sam <- sample(size=nrow(DDat), x=1:nrow(DDat), replace=T)
     DDatB <- DDat[sam,]
-    MODEL_boot <- lm(diff ~ hoursCildCare_2019 + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
+    MODEL_boot <- lm(diff ~ hoursCildCare_2019 + OW + mig + as.factor(ageYoungChild_cat) + 
                   as.factor(numChHH_cat) +  as.factor(eduLevel) + as.factor(empl_2019),  
                 weights=phrf_cati, data = DDatB)
     prB <- predict(MODEL_boot, type="response")  
@@ -89,78 +92,6 @@ getPredDiffTimes <- function(DDat) {
                   "1ch", "2ch", "3+ch", "lowEdu", "medEdu", "highEdu", 
                   "fullT", "partT", "notEmpl", "otherEmpl", 
                   "h02", "h35", "h6+")
-    mb <- round(mb,2)    
-    return(mb)
-  }
-  res <- sapply(1:200, makeTheBoot)
-  qu <- apply(res, 1, quantile, probs = seq(from=0, to=1, by=0.025), na.rm=T)
-  confLC <- 2*m-qu[40,] # 97,5% Perzentil
-  confUC <- 2*m-qu[2,] # 2,5% Perzentil
-  res <-  cbind(m, confLC, confUC)
-  names(res) <- c("p.est", "ci.low", "ci.up")
-  res <- round(res,2)
-  return(res)
-}
-
-# FUNCTION linear model (without employment status 2019 as indep. var)
-getPredDiffTimes_2 <- function(DDat) {
-
-  MODEL <- lm(diff ~ hoursCildCare_2019 + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
-                as.factor(numChHH_cat) +  as.factor(eduLevel),  
-              weights=phrf_cati, data = DDat)
-  summary(MODEL)
-  
-  pr <- predict(MODEL, type="response")  
-  
-  m <- rep(NA,16)
-  m[1] <- mean(pr[DDat$OW==0], na.rm=TRUE)
-  m[2] <- mean(pr[DDat$OW==1], na.rm=TRUE)
-  m[3] <- mean(pr[DDat$mig==0], na.rm=TRUE)
-  m[4] <- mean(pr[DDat$mig==1], na.rm=TRUE)
-  m[5] <- mean(pr[DDat$ageYoungChild_cat==0], na.rm=TRUE)
-  m[6] <- mean(pr[DDat$ageYoungChild_cat==1], na.rm=TRUE)
-  m[7] <- mean(pr[DDat$ageYoungChild_cat==2], na.rm=TRUE)
-  m[8] <- mean(pr[DDat$numChHH_cat==0], na.rm=TRUE)
-  m[9] <- mean(pr[DDat$numChHH_cat==1], na.rm=TRUE)
-  m[10] <- mean(pr[DDat$numChHH_cat==2], na.rm=TRUE)
-  m[11] <- mean(pr[DDat$eduLevel==0], na.rm=TRUE)
-  m[12] <- mean(pr[DDat$eduLevel==1], na.rm=TRUE)
-  m[13] <- mean(pr[DDat$eduLevel==2], na.rm=TRUE)
-  m[14] <- mean(pr[DDat$hours2019_cat==0], na.rm=TRUE)
-  m[15] <- mean(pr[DDat$hours2019_cat==1], na.rm=TRUE)
-  m[16] <- mean(pr[DDat$hours2019_cat==2], na.rm=TRUE)
-  names(m) <- c("east", "west", "noMig", "mig", "age02", "age35", "age611",
-                "1ch", "2ch", "3+ch", "lowEdu", "medEdu", "highEdu", 
-                "h02", "h35", "h6+")
-  m <- round(m,2)
-  
-  makeTheBoot <- function(it){
-    sam <- sample(size=nrow(DDat), x=1:nrow(DDat), replace=T)
-    DDatB <- DDat[sam,]
-    MODEL_boot <- lm(diff ~ hoursCildCare_2019 + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
-                       as.factor(numChHH_cat) +  as.factor(eduLevel),  
-                     weights=phrf_cati, data = DDatB)
-    prB <- predict(MODEL_boot, type="response")  
-    mb <- rep(NA,16)
-    mb[1] <- mean(prB[DDatB$OW==0], na.rm=TRUE)
-    mb[2] <- mean(prB[DDatB$OW==1], na.rm=TRUE)
-    mb[3] <- mean(prB[DDatB$mig==0], na.rm=TRUE)
-    mb[4] <- mean(prB[DDatB$mig==1], na.rm=TRUE)
-    mb[5] <- mean(prB[DDatB$ageYoungChild_cat==0], na.rm=TRUE)
-    mb[6] <- mean(prB[DDatB$ageYoungChild_cat==1], na.rm=TRUE)
-    mb[7] <- mean(prB[DDatB$ageYoungChild_cat==2], na.rm=TRUE)
-    mb[8] <- mean(prB[DDatB$numChHH_cat==0], na.rm=TRUE)
-    mb[9] <- mean(prB[DDatB$numChHH_cat==1], na.rm=TRUE)
-    mb[10] <- mean(prB[DDatB$numChHH_cat==2], na.rm=TRUE)
-    mb[11] <- mean(prB[DDatB$eduLevel==0], na.rm=TRUE)
-    mb[12] <- mean(prB[DDatB$eduLevel==1], na.rm=TRUE)
-    mb[13] <- mean(prB[DDatB$eduLevel==2], na.rm=TRUE)
-    mb[14] <- mean(prB[DDatB$hours2019_cat==0], na.rm=TRUE)
-    mb[15] <- mean(prB[DDatB$hours2019_cat==1], na.rm=TRUE)
-    mb[16] <- mean(prB[DDatB$hours2019_cat==2], na.rm=TRUE)
-    names(mb) <- c("east_germ", "west_germ", "noMig", "mig", "age02", "age35", "age611",
-                   "1ch", "2ch", "3+ch", "lowEdu", "medEdu", "highEdu", 
-                   "h02", "h35", "h6+")
     mb <- round(mb,2)    
     return(mb)
   }
@@ -218,12 +149,12 @@ getPredDiffTimes_RE <- function(DDat) {
 # ---------------------------------------------------------------------
 # Test for strict exogeneity (using residuals)
 # ---------------------------------------------------------------------
-MODEL <- lm(diff ~ hoursCildCare_2019 + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
+MODEL <- lm(diff ~ hoursCildCare_2019 + OW + mig + as.factor(ageYoungChild_cat) + 
               as.factor(numChHH_cat) +  as.factor(eduLevel) + as.factor(empl_2019),  
             weights=phrf_cati, data = DAT_panel_m)
 summary(lm(MODEL$residuals ~ DAT_panel_m$hoursCildCare_2019))
 
-MODEL <- lm(diff ~ hoursCildCare_2019 + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
+MODEL <- lm(diff ~ hoursCildCare_2019 + OW + mig + as.factor(ageYoungChild_cat) + 
               as.factor(numChHH_cat) +  as.factor(eduLevel) + as.factor(empl_2019),  
             weights=phrf_cati, data = DAT_panel_f)
 summary(lm(MODEL$residuals ~ DAT_panel_f$hoursCildCare_2019)) 
@@ -236,38 +167,22 @@ hist(DAT_panel$diff)
 
 # Men in Partnership
 res_m <- getPredDiffTimes(DAT_panel_m)
-res_m <- getPredDiffTimes_2(DAT_panel_m)
-
-mod_m_EW <- lm(diff ~ as.factor(hours2019_cat) + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
-              as.factor(numChHH_cat) +  as.factor(eduLevel) + as.factor(empl_2019),  
-            weights=phrf_cati, data = DAT_panel_m)
-summary(mod_m_EW)
-
-mod_m_oEW <- lm(diff ~ as.factor(hours2019_cat) + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
-                 as.factor(numChHH_cat) +  as.factor(eduLevel),  
-               weights=phrf_cati, data = DAT_panel_m)
-summary(mod_m_oEW)
 
 # Women in Partnership
 res_f <- getPredDiffTimes(DAT_panel_f)
-res_f <- getPredDiffTimes_2(DAT_panel_f)
-
-mod_f_EW <- lm(diff ~ as.factor(hours2019_cat) + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
-                 as.factor(numChHH_cat) +  as.factor(eduLevel) + as.factor(empl_2019),  
-               weights=phrf_cati, data = DAT_panel_f)
-summary(mod_f_EW)
-mod_f_oEW <- lm(diff ~ as.factor(hours2019_cat) + as.factor(la) + OW + mig + as.factor(ageYoungChild_cat) + 
-                  as.factor(numChHH_cat) +  as.factor(eduLevel),  
-                weights=phrf_cati, data = DAT_panel_f)
-summary(mod_f_oEW)
 
 # Plot it
-namM <- c("Eastern Germamny", "Western Germany", "no migration background", "migration background", 
-          "age youngest child: 0-2", "age youngest child: 3-5", "age youngest child: 6-11",
-          "number of children in household: 1", "number of children in household: 2", "number of children in household: 3 and more",
-          "low education", "medium education", "high education", 
-          "employment status 2019: full-time", "employment status 2019: part-time", "employment status 2019: not employed", "employment 2019: other",
-          "care hours 2019: 0-2","care hours 2019: 3-5", "care hours 2019: 6 and more")
+ex1 <- paste("Age youngest child: 0","\U2012", "2", sep="")
+ex2 <- paste("Age youngest child: 3","\U2012", "5", sep="")
+ex3 <- paste("Age youngest child: 6","\U2012", "11", sep="")
+ex4 <- paste("Care hours 2019: 0","\U2012", "2", sep="")
+ex5 <- paste("Care hours 2019: 3","\U2012", "5", sep="")
+namM <- c("Eastern Germamny", "Western Germany", "No migration background", "Migration background", 
+          ex1, ex2, ex3,
+          "Number of children in household: 1", "Number of children in household: 2", "Number of children in household: 3 and more",
+          "Low education", "Medium education", "High education", 
+          "Employment status 2019: full-time", "Employment status 2019: part-time", "Employment status 2019: not employed", "Employment 2019: other",
+          ex4,ex5, "Care hours 2019: 6 and more")
 model_m <- data.frame(Predictor = namM,
                       B = res_m[,1],
                       CI_low= res_m[,2],
@@ -288,11 +203,13 @@ zp <- ggplot(allModelFrame, aes(colour = Gender))
 zp <- zp + geom_hline(yintercept = 0, colour = gray(1/2), lty=2)
 zp <- zp + geom_linerange(aes(x=Predictor, ymin= CI_low, ymax=CI_up),
                             lwd=1, position=position_dodge(width = 1/2))
+zp <- zp + scale_color_manual('Gender', labels=c('Women','Men'),
+                              values=c('blue','red'))
 zp <- zp + geom_point(aes(x=Predictor, y=B),
                         shape=21, fill="WHITE",
                         position=position_dodge(width = 1/2))
 zp <- zp + coord_flip() + theme_bw() +  xlab("") +  
-      ylab("difference in child care time\n(in hours per day)") 
+      ylab("Difference in child care time\n(in hours per day)") 
 print(zp)
 
 
@@ -344,5 +261,6 @@ DAT_res_long_f <- DAT_res_long[DAT_res_long$sex %in% 0 & DAT_res_long$la %in% c(
 MODEL02 <- lm(hoursCildCare  ~  as.factor(time) + as.factor(empl), weights=phrf_cati, data = DAT_res_long_f)
 summary(MODEL02)
 getPredDiffTimes_RE(DAT_res_long_f)
+
 
 
