@@ -15,10 +15,10 @@ Data
 Basic variable description
 -----------------------------
 Variables used (raw, not yet prepared for data user, will be in upcoming releases v36 and v37): 
-- birth dates of children: "bjk_87_02_1","bjk_87_02_2","bjk_87_02_3","bjk_87_02_4","bjk_87_02_5","bjk_87_02_6","bjk_87_02_7","bjk_87_02_8","bjk_87_02_9"
-- Place of living at interview: federal state "bula"
-- Living arrangement: "bjp_197", "bjp_276_q154"
-- hours spend for child care: pli0044_v3
+- birth dates of (first nine) children of household: "bjk_87_02_1","bjk_87_02_2","bjk_87_02_3","bjk_87_02_4","bjk_87_02_5","bjk_87_02_6","bjk_87_02_7","bjk_87_02_8","bjk_87_02_9"
+- Place of living at interview (surveyed person in household): federal state "bula"
+- Living arrangement (of surveyed person in household: single, married, in cohabitation): "bjp_197", "bjp_276_q154"
+- hours spend for child care (in number of hours): pli0044_v3
 - survey weights for SOEP CoV survey: phrf_cati
 Variables generated within SOEP data:
 - hid - household ID
