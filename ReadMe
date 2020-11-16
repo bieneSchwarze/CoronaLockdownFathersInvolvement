@@ -30,6 +30,7 @@ Variables generated within SOEP data:
 - pgcasmin - CASMIN educational attainment
 - plb0022_h - employment status (harmonized)
 - migback - migration background
+-> Variable description of SOEP variables available under https://paneldata.org/search/all?Study=%5B%22SOEP-Core%22%5D
 
 ------------
 Source Code
