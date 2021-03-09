@@ -20,9 +20,7 @@ load("_workspace_dataDescribed_2018.RData") # load workspace stored from descrip
 # --------------------------------------------------------------------------
 # FUNCTION linear model
 getPredDiffTimes <- function(DDat) {
-  
-  DDat <- DAT_panel_m
-  
+
   MODEL <- lm(diff ~ hoursCildCare_2018 + OW + mig + as.factor(ageKat) + 
                   as.factor(numChHH_cat) +  as.factor(eduLevel) + as.factor(empl2018),  
                 weights=phrf, data = DDat)
@@ -103,9 +101,9 @@ getPredDiffTimes <- function(DDat) {
 }
 
 # FUNCTION FE panel
-getPredDiffTimes_RE <- function(DDat) {
+getPredDiffTimes_FE <- function(DDat) {
 
-  MODEL <- lm(hoursCildCare  ~  time + as.factor(empl), weights=phrf, data = DDat)
+  MODEL <- lm(hoursCildCare  ~  -1 + as.factor(pid) + time + as.factor(empl), weights=phrf, data = DDat)
   pr <- predict(MODEL, type="response")  
   m <- rep(NA,6)
   m[1] <- mean(pr[DDat$time==1], na.rm=TRUE)
@@ -117,10 +115,18 @@ getPredDiffTimes_RE <- function(DDat) {
   names(m) <- c("2018", "2019", "fullT", "partT", "notEmpl", "otherEmpl")
   m <- round(m,2)
   
+  n.ind <- length(unique(DDat$pid))
+  unique.pids <- unique(DDat$pid)  
   makeTheBoot <- function(it){
-    sam <- sample(size=nrow(DDat), x=1:nrow(DDat), replace=T)
-    DDatB <- DDat[sam,]
-    MODEL_boot <- lm(hoursCildCare  ~  as.factor(time) + as.factor(empl), weights=phrf, data = DDatB)
+    sam <- sample(size=n.ind, x=1:n.ind, replace=T)
+    pids.boot <- unique.pids[sam]
+    DDatB <- NULL
+    for(j in 1:length(pids.boot)){
+      DDatB <- rbind.data.frame(DDatB, DDat[DDat$pid %in% pids.boot[j],])
+    }
+    DDatB$pid <- rep(1:length(pids.boot), each=2)
+    MODEL_boot <- lm(hoursCildCare  ~ -1 + as.factor(pid) + as.factor(time) + as.factor(empl), weights=phrf, 
+                     data = DDatB)
     prB <- predict(MODEL_boot, type="response")  
     mb <- rep(NA,6)
     mb[1] <- mean(prB[DDatB$time==1], na.rm=TRUE)
@@ -221,15 +227,15 @@ head(DAT_long)
 
 # Men in Partnership
 DAT_long_m <- DAT_long[DAT_long$sex %in% 1,]
-MODEL01 <- lm(hoursCildCare  ~  as.factor(time) + as.factor(empl), weights=phrf, data = DAT_long_m)
+MODEL01 <- lm(hoursCildCare  ~  -1 + as.factor(pid) + as.factor(time) + as.factor(empl), weights=phrf, data = DAT_long_m)
 summary(MODEL01)
-getPredDiffTimes_RE(DAT_long_m)
+getPredDiffTimes_FE(DAT_long_m)
 
 # Women in Partnership
 DAT_long_f <- DAT_long[DAT_long$sex %in% 0,]
-MODEL02 <- lm(hoursCildCare  ~  as.factor(time) + as.factor(empl), weights=phrf, data = DAT_long_f)
+MODEL02 <- lm(hoursCildCare  ~  -1 + as.factor(pid) + as.factor(time) + as.factor(empl), weights=phrf, data = DAT_long_f)
 summary(MODEL02)
-getPredDiffTimes_RE(DAT_long_f)
+getPredDiffTimes_FE(DAT_long_f)
 
 # ---------------------------------------------------------------------------
 # Model 2 (fixed effects, panel), remove persons with children below age one
@@ -246,12 +252,12 @@ head(DAT_res_long)
 
 # Men in Partnership
 DAT_res_long_m <- DAT_res_long[DAT_res_long$sex %in% 1,]
-MODEL01 <- lm(hoursCildCare  ~  as.factor(time) + as.factor(empl), weights=phrf, data = DAT_res_long_m)
+MODEL01 <- lm(hoursCildCare  ~  -1 + as.factor(pid) + as.factor(time) + as.factor(empl), weights=phrf, data = DAT_res_long_m)
 summary(MODEL01)
-getPredDiffTimes_RE(DAT_res_long_m)
+getPredDiffTimes_FE(DAT_res_long_m)
 
 # Women in Partnership
 DAT_res_long_f <- DAT_res_long[DAT_res_long$sex %in% 0,]
-MODEL02 <- lm(hoursCildCare  ~  as.factor(time) + as.factor(empl), weights=phrf, data = DAT_res_long_f)
+MODEL02 <- lm(hoursCildCare  ~  -1 + as.factor(pid) + as.factor(time) + as.factor(empl), weights=phrf, data = DAT_res_long_f)
 summary(MODEL02)
-getPredDiffTimes_RE(DAT_res_long_f)
+getPredDiffTimes_FE(DAT_res_long_f)
